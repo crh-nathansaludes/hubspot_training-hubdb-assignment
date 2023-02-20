@@ -1,0 +1,14 @@
+<!--
+    templateType: page
+    isAvailableForNewContent: true
+    label: "Theatre Plays Template"
+-->
+{% extends "./layouts/base_layout.html" %}
+
+{% block body %}
+  {% if dynamic_page_hubdb_row %}
+    {% global_partial path="./partial-templates/theatre-play.html" %}
+  {% elif dynamic_page_hubdb_table_id %}
+    {% global_partial path="./partial-templates/theatre-play-listing.html" %}
+  {% endif %}
+{% endblock body %}

@@ -1,0 +1,70 @@
+<!--
+    templateType: global_partial
+    isAvailableForNewContent: false
+-->
+<!-- Begin partial -->
+{% set show = dynamic_page_hubdb_row %}
+
+<main class="w-full min-h-screen">
+  <div class="container mx-auto min-h-screen p-10">
+    <a href="/theater-plays" target="_self" class="block underline decoration-1 mb-7 text-white/50 font-semibold capitalize">
+      BACK TO LISTING
+    </a>
+    <!-- show -->
+    <section class="show w-full min-h-[60vh] flex gap-x-10">
+      <!-- poster/image -->
+      <div class="show-poster shrink-0 w-[28rem]">
+        <img class="bg-stone-600 h-full object-cover" src="{{ show.poster_image.url }}" alt="{{ show.poster_image.altText }}">
+      </div>
+
+      <!-- details -->
+      <div class="show-details">
+        <p class="px-4 py-1.5 rounded-full font-bold text-base bg-white/30 text-white w-max">
+          {{ format_datetime(show.show_start_date, "YYYY MMMM") }}
+        </p>
+        <h1 class="capitalize text-7xl font-bold my-2 text-white pb-6">
+          {{ show.name }}
+        </h1>
+        <div class="storyline my-2">
+          <h3 class="capitalize text-lg font-bold text-white/20">STORYLINE</h3>
+          <p class="text-white/80">
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint, officiis fugiat! Dignissimos facilis reiciendis numquam id earum ea alias sit culpa nihil libero harum neque facere ipsum illo, excepturi doloremque.
+            Provident facere dolore, quisquam laudantium ex esse odit dolorem repudiandae accusantium veniam error recusandae? Dolore excepturi molestiae veritatis fugit culpa.
+          </p>
+        </div>
+
+        <div class="show-schedule py-4 mt-6 border-t border-white/10">
+          <h3 class="capitalize text-lg font-bold text-white/20 my-2">SHOW INFORMATION</h3>
+          <div class="table mb-7">
+            <div class="table-row">
+              <div class="table-cell text-white/50 font-semibold py-2 pr-10">VENUE</div>
+              <div class="table-cell text-white font-semibold">
+                <span class="block bg-white/30 px-4 py-1 rounded-full text-white w-max">
+                  {{ show.venue.name }}
+                </span>
+              </div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell text-white/50 font-semibold py-2 pr-10">SHOWING TIME</div>
+              <div class="table-cell text-white font-semibold">
+                <span class="block bg-white/30 px-4 py-1 rounded-full text-white w-max">
+                  <!-- 12:00 PM -->
+                  {{ format_datetime(show.show_start_date, "h:mm a") }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <!-- button -->
+          {% if show.show_start_date >= today()|plus_time(12, "hours")|unixtimestamp %}
+            <a href="{{ show.ticket_link }}" target="_blank">
+              <button class="px-4 py-3 text-yellow-800 hover:text-yellow-900 font-bold rounded-md text-xl bg-gradient-to-b from-yellow-200 to-yellow-500 hover:from-yellow-300 hover:to-yellow-500 show-lg">
+                BUY TICKETS
+              </button>
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<!-- End partial -->

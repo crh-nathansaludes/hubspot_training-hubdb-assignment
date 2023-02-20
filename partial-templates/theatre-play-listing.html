@@ -1,0 +1,126 @@
+<!--
+    templateType: global_partial
+    isAvailableForNewContent: false
+-->
+<!-- Begin partial -->
+
+{# variables #}
+{% set test_boolean = false %}
+{% set all_shows = hubdb_table_rows("theatre_plays") %}
+
+{# get time today @12pm #}
+{% set mid_day = today()|plus_time(12, "hours")|unixtimestamp %}
+
+{# Get next future show but is not showing today #}
+{% set next_upcoming_show = all_shows|sort(true, false, "show_start_date")|first %}
+
+{% set featured_show = (now_showing is truthy ? now_showing : next_upcoming_show) %}
+
+{# Get upcoming performances/shows #}
+{% set upcoming_shows = [] %}
+{% for upcoming_show in all_shows %}
+  {% if unixtimestamp(upcoming_show.show_start_date) > today()|unixtimestamp %}
+    {% do upcoming_shows.append(upcoming_show) %}
+  {% endif %}
+{% endfor %}
+
+{# Get past performances/shows #}
+{% set past_shows = [] %}
+{% for past_show in all_shows %}
+  {% if unixtimestamp(past_show.show_start_date) < today()|unixtimestamp  %}
+    {% do past_shows.append(past_show) %}
+  {% endif %}
+{% endfor %}
+
+<main class="w-full h-full">
+  {#
+  <p class="text-white">
+    Later Today: {{ mid_day }} <br>
+    Now Showing: {{ now_showing|pprint }} <br>
+    Upcoming Shows: {{ upcoming_shows|length }} <br>
+    Past Shows: {{ past_shows|length }} <br>
+
+    {% for test in all_shows %}
+      {{ (test.show_start_date|between_times(mid_day, "days")|int == 0) ? "" : "" }}
+    {% endfor %}
+    <br>
+    test_boolean: {{ test_boolean }} <br>
+  </p>
+  #}
+
+
+  <!-- Featured Show Section -->
+  <section class="featured-show">
+    {% set hasNowShowing = true %}
+    {% for current_show in all_shows %}
+      {% if (current_show.show_start_date|between_times(mid_day, "days")) == 0 %}
+        <a href="{{ request.path }}/{{ current_show.hs_path }}" class="relative w-full bg-pink-300">
+          <div class="image w-full h-[70vh] relative">
+            <img class="bg-stone-500 object-cover w-full h-full object-top" src="{{ current_show.poster_image.url }}" alt="{{ current_show.name }}">
+          </div>
+          <div class="movie-details w-full absolute bottom-0 p-10 pt-96 bg-gradient-to-b from-black/0 to-black">
+            <h2 class="text-2xl font-semibold text-white/50">NOW SHOWING</h2>
+            <h1 class="capitalize text-7xl font-bold my-2 text-white" style="font-family: 'Plus Jakarta Sans';">
+              {{ current_show.name }}
+            </h1>
+            <p class="block text-white/60 font-semibold mt-4">
+              <span class="inline-block border-r-2 pr-3 mr-3 border-white/30">{{ format_datetime(current_show.show_start_date, "h:mm a") }}</span>
+              <span>@{{ current_show.venue.name }}</span>
+            </p>
+          </div>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <!-- Show List Section -->
+  <section class="upcoming-performances block bg-black/95 text-gray-300">
+    <div class="container w-full p-10 mx-auto">
+      <div class="section-heading flex justify-between items-center mb-10 pb-3 border-b border-white/20 text-white/50">
+        <h2 class="text-2xl font-semibold">
+          UPCOMING PERFORMANCES
+        </h2>
+        <a href="/" class="underline font-semibold">See All</a>
+      </div>
+      <div class="swiper list-shows flex gap-10 w-full">
+        <div class="swiper-wrapper list-container">
+          {% for show in upcoming_shows|sort(true, false, "show_start_date") %}
+            <!-- slide -->
+            <a href="{{ request.path }}/{{ show.hs_path }}" class="swiper-slide show mr-10 w-72 max-w-[18rem]">
+              <div class="thumbnail bg-stone-600 h-96 w-full">
+                <img class="object-cover object-top w-full h-full" src="{{ show.poster_image.url }}" alt="{{ show.poster_image.altText }}">
+              </div>
+              <div class="show-details w-full">
+                <h3 class="title text-3xl font-semibold my-2">{{ show.name }}</h3>
+                <p class="text-base text-white/20 font-semibold">{{ format_datetime(show.show_start_date, "YYYY MMMM") }}</p>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="container w-full p-10 mx-auto">
+      <div class="section-heading flex justify-between items-center mb-10 pb-3 border-b border-white/20 text-white/50">
+        <h2 class="text-2xl font-semibold">
+          PAST PERFORMANCES
+        </h2>
+        <a href="/" class="underline font-semibold">See All</a>
+      </div>
+      <div class="list-shows my-10 w-full flex justify-center gap-y-10 flex-wrap">
+        {% for show in past_shows|sort(true, false, "show_start_date") %}
+        <!-- slide -->
+        <a href="{{ request.path }}/{{ show.hs_path }}" class="block mr-10 w-72 max-w-[18rem]">
+          <div class="thumbnail bg-stone-600 h-96 w-full">
+            <img class="object-cover object-top w-full h-full" src="{{ show.poster_image.url }}" alt="{{ show.poster_image.altText }}">
+          </div>
+          <div class="show-details w-full">
+            <h3 class="title text-3xl font-semibold my-2">{{ show.name }}</h3>
+            <p class="text-base text-white/20 font-semibold">{{ format_datetime(show.show_start_date, "YYYY MMMM") }}</p>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+<!-- End partial -->
